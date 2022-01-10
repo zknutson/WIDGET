@@ -4,13 +4,14 @@ public class Star {
     //Acceleration, velocity, and displacement values in ordered pairs (x,y)
     private double[] a = new double[2],v = new double[2],d = new double[2];
     //Mass in solar masses
-    private double mass;
+    private double mass, radius;
     
     //Constructor
     public Star(double[] velocity, double[] displacement, double mass) {
         v = velocity;
         d = displacement;
         this.mass = mass;
+        this.radius = getRadius();
     }
     
     //Main timestepping methods
@@ -38,5 +39,10 @@ public class Star {
     public void setMass(double mass) {
         this.mass = mass;
     }
-    
+    public double getRadius() {
+        if (this.mass > 1) {
+            return Math.pow(this.mass, 0.57);
+        }
+        return Math.pow(this.mass, 0.88);
+    }
 }
