@@ -2,37 +2,37 @@ package widget;
 import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 public class Widget extends JPanel{ 
-    //Gravity constant in (astronomical units * (astronomical units/s)^2) / Solar masses
-    static final double G = 3.964913 * Math.pow(10, -14);
+    //Gravity constant in solar radii, solar masses, km/s (astronomical units * (astronomical units/s)^2) / Solar masses
+    static final double G = 1.90809 * 100000;//3.964913 * Math.pow(10, -14)
     //Time in seconds
     static double time = 0;
     static double tStep = 1;
     static double tFinal = 3600 * 24 * 365.0 * 1000;
     //Coordinates used for rendering output
-    static int x1,x2,y1,y2;
-
+    static double[] pos1,pos2;
+    
     public static void main(String[] args) {
-        
         //Initialize render output
         JFrame frame = new JFrame();
         frame.getContentPane().add(new Widget());
-        frame.setSize(1700,1000);
+        frame.setSize(1000,1000);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);      
         
-        //Velocity and displacement from the origin, ordered pairs (x,y)
-        double[] v,d;
+        //Velocity and displacement from the origin
+        Vector2D v,d;
         
         //Declare star 1
-        v = new double[] {0,1.9906 * Math.pow(10, -7)};
-        d = new double[] {1,0};
+        v = new Vector2D(0,29.78);
+        d = new Vector2D(214.93946938362,0);
         Star s1 = new Star(v,d,1/332946.0);
         
         //Declare star 2        
-        v = new double[] {0,0};
-        d = new double[] {0,0};
+        v = new Vector2D(0,0);
+        d = new Vector2D(0,0);
         BlackHole s2 = new BlackHole(v,d,1);
         
         //Orbit/Accuracy counting trackers
@@ -44,44 +44,36 @@ public class Widget extends JPanel{
         while (time <= tFinal) {
             
             //Saves the distance in the x direction and y direction for later, and computes the hypotenuse (total distance)
-            double xdist = s2.getDis()[0] - s1.getDis()[0];
-            double ydist = s2.getDis()[1] - s1.getDis()[1];
-            double distSqrd = calcDistanceSqrd(xdist, ydist);
-            
+            double distSq = s2.getDis().distanceSq(s1.getDis());
+            //System.out.println(distSq);
             //Defines the timestep, based on the star's distance^2
-            tStep = distSqrd * 40;
-            //Find the force of gravity on the stars
-            double GForce = calcGForce(s1, s2, distSqrd);
-
+            tStep = distSq * 0.0000000001;
+            //Find the force of gravity on the star
+            double GForce = calcGForce(s1, s2, distSq);
+            //System.out.println(GForce);
             //Determine the coordinate component forces for each star (newton's third law, saves cpu cycles so not computing twice)
-            double [] Fg1 = getCoordCompAcceleration(xdist,ydist,GForce);
-            double [] Fg2 = new double[] {Fg1[0] * -1, Fg1[1] * -1};
-
+            Vector2D Fg1 = getAcceleration(s1.getDis(),s2.getDis(),GForce);
+            Vector2D Fg2 = Fg1.negate();
             //Update the velocity of each star given the gravitational force in coordinate component directions (will compute acceleration first)
             s1.updateVelocity(Fg1, tStep);
             s2.updateVelocity(Fg2, tStep);
-
             //Update the position of each star based off the velocity previously calculated
             s1.updatePosition(tStep);
             s2.updatePosition(tStep);
 
             //Iterate timestep
             time += tStep;
-
             //Define rendered coordinates
-            x1 = (int)(s1.getDis()[0] * 300);
-            x2 = (int)(s2.getDis()[0] * 300);
-            y1 = (int)(s1.getDis()[1] * 300);
-            y2 = (int)(s2.getDis()[1] * 300);
-
+            pos1 = new double[] {s1.getDis().getX(),s1.getDis().getY()};
+            pos2 = new double[] {s2.getDis().getX(),s2.getDis().getY()};
             //Accuracy tracking
-            double x1a = s1.getDis()[0];
+            double x1a = s1.getDis().getX();
             if (x1a > tmp) {
                 off = true;
             }
             else if (off) {
                 System.out.println("Orbit #: " + count);
-                System.out.println(tmp);
+                System.out.println(tmp / 214.93946938362);
                 off = false;
                 count++;
             }
@@ -100,16 +92,20 @@ public class Widget extends JPanel{
     }
     
     //Converts the star's distance in each direction and the total gravitational force between stars to compute force in coordinate component form
-    public static double[] getCoordCompAcceleration (double i, double j, double magnitude) {
-        double x = j/i;
-        double y = 1 + x * x;
-        double cosarctan = Math.sqrt(y) / (y);
-        double sinarctan = cosarctan * x;
-        if (i < 0) {
-            cosarctan *= -1;
-            sinarctan *= -1;
-        }
-        return new double[] {cosarctan * magnitude, sinarctan * magnitude};
+    public static Vector2D getAcceleration (Vector2D v1, Vector2D v2, double magnitude) {
+        return v2.subtract(v1).normalize().scalarMultiply(magnitude);
+        //double x = j/i;
+        //double y = 1 + x * x;
+        //double cosarctan = Math.sqrt(y) / (y);
+        //double sinarctan = cosarctan * x;
+        //if (i < 0) {
+            //cosarctan *= -1;
+            //sinarctan *= -1;
+        //}
+        //return new double[] {cosarctan * magnitude, sinarctan * magnitude};
+    }
+
+    public Widget() {
     }
     
     //Graphics
@@ -118,8 +114,9 @@ public class Widget extends JPanel{
         g.clearRect(0, 0, 1700, 1000);
         int height = 50;
         int width = 50;
-        g.fillArc(x1 - (width / 2) + 1000, y1 - (height / 2) + 500, width, height, 0, 360);
-        g.fillArc(x2 - (width / 20) + 1000, y2 - (height / 20) + 500, width / 10, height / 10, 0, 360);
+        g.fillArc((int)pos1[0] - (width / 2) + 500, (int)pos1[1] - (height / 2) + 500, width, height, 0, 360);
+        g.fillArc((int)pos2[0] - (width / 20) + 500, (int)pos2[1] - (height / 20) + 500, width / 10, height / 10, 0, 360);
         repaint();
     } 
+    
 }

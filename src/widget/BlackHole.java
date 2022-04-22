@@ -5,12 +5,15 @@
  */
 package widget;
 
+import org.apache.commons.math3.geometry.Vector;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+
 /**
  *
  * @author Majesticc
  */
 public class BlackHole extends Star {
-    public BlackHole(double[] velocity, double[] displacement, double mass) {
+    public BlackHole(Vector2D velocity, Vector2D displacement, double mass) {
         super(velocity,displacement,mass);
     }
 }

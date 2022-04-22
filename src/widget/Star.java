@@ -1,13 +1,16 @@
 package widget;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+
 public class Star {
     //Acceleration, velocity, and displacement values in ordered pairs (x,y)
-    private double[] a = new double[2],v = new double[2],d = new double[2];
+    private Vector2D a,v,d;    
     //Mass in solar masses
     private double mass, radius;
     
     //Constructor
-    public Star(double[] velocity, double[] displacement, double mass) {
+    public Star(Vector2D velocity, Vector2D displacement, double mass) {
+        a = new Vector2D(0,0);
         v = velocity;
         d = displacement;
         this.mass = mass;
@@ -15,20 +18,30 @@ public class Star {
     }
     
     //Main timestepping methods
-    public void updateVelocity(double[] Fg, double tStep) {
+    public void updateVelocity(Vector2D Fg, double tStep) {
         //Find the acceleration in each coordinate component direction, based on the gravitational force and the star's distance in each direction
-        this.a[0] = Fg[0] / mass;
-        this.a[1] = Fg[1] / mass;
-        v[0] += a[0] * tStep;
-        v[1] += a[1] * tStep;
+        this.a = Fg.scalarMultiply(1/mass);
+        //System.out.println("GForce: " + Fg);
+        //System.out.println("Mass: " + mass);
+        //System.out.println("Before: " + v);
+        this.v = v.add(tStep,a);
+        //System.out.println("After: " + v);
+        //System.out.println(tStep);
+        //System.out.println("Acceleration:" + a);
+        //System.out.println("Velocity:" + v);
     }
     public void updatePosition(double tStep) {
-        d[0] += v[0] * tStep - 0.5 * a[0] * tStep * tStep;
-        d[1] += v[1] * tStep - 0.5 * a[1] * tStep * tStep; 
+        //System.out.println("Before: " + d);
+        d = d.add(tStep,v);
+        //System.out.println("Velocity: " + v);
+        //System.out.println("Middle: " + d);
+        d = d.subtract(0.5 * tStep * tStep,a);
+        //System.out.println("Acc: " + a);
+        //System.out.println("Position: " + d);
     }
 
     //Getters and Setters
-    public double[] getDis() {
+    public Vector2D getDis() {
         return d;
     }
 
