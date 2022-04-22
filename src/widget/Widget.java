@@ -5,8 +5,8 @@ import javax.swing.JPanel;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 public class Widget extends JPanel{ 
-    //Gravity constant in solar radii, solar masses, km/s (astronomical units * (astronomical units/s)^2) / Solar masses
-    static final double G = 1.90809 * 100000;//3.964913 * Math.pow(10, -14)
+    //Gravity constant in Solar-Radii, Solar Masses, and Kilometers/second
+    static final double G = 1.90809 * 100000;
     //Time in seconds
     static double time = 0;
     static double tStep = 1;
@@ -45,12 +45,10 @@ public class Widget extends JPanel{
             
             //Saves the distance in the x direction and y direction for later, and computes the hypotenuse (total distance)
             double distSq = s2.getDis().distanceSq(s1.getDis());
-            //System.out.println(distSq);
             //Defines the timestep, based on the star's distance^2
             tStep = distSq * 0.0000000001;
             //Find the force of gravity on the star
             double GForce = calcGForce(s1, s2, distSq);
-            //System.out.println(GForce);
             //Determine the coordinate component forces for each star (newton's third law, saves cpu cycles so not computing twice)
             Vector2D Fg1 = getAcceleration(s1.getDis(),s2.getDis(),GForce);
             Vector2D Fg2 = Fg1.negate();
@@ -94,15 +92,6 @@ public class Widget extends JPanel{
     //Converts the star's distance in each direction and the total gravitational force between stars to compute force in coordinate component form
     public static Vector2D getAcceleration (Vector2D v1, Vector2D v2, double magnitude) {
         return v2.subtract(v1).normalize().scalarMultiply(magnitude);
-        //double x = j/i;
-        //double y = 1 + x * x;
-        //double cosarctan = Math.sqrt(y) / (y);
-        //double sinarctan = cosarctan * x;
-        //if (i < 0) {
-            //cosarctan *= -1;
-            //sinarctan *= -1;
-        //}
-        //return new double[] {cosarctan * magnitude, sinarctan * magnitude};
     }
 
     public Widget() {

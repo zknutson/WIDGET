@@ -21,23 +21,11 @@ public class Star {
     public void updateVelocity(Vector2D Fg, double tStep) {
         //Find the acceleration in each coordinate component direction, based on the gravitational force and the star's distance in each direction
         this.a = Fg.scalarMultiply(1/mass);
-        //System.out.println("GForce: " + Fg);
-        //System.out.println("Mass: " + mass);
-        //System.out.println("Before: " + v);
         this.v = v.add(tStep,a);
-        //System.out.println("After: " + v);
-        //System.out.println(tStep);
-        //System.out.println("Acceleration:" + a);
-        //System.out.println("Velocity:" + v);
     }
     public void updatePosition(double tStep) {
-        //System.out.println("Before: " + d);
         d = d.add(tStep,v);
-        //System.out.println("Velocity: " + v);
-        //System.out.println("Middle: " + d);
         d = d.subtract(0.5 * tStep * tStep,a);
-        //System.out.println("Acc: " + a);
-        //System.out.println("Position: " + d);
     }
 
     //Getters and Setters
