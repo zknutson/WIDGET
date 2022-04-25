@@ -13,6 +13,8 @@ public class Widget extends JPanel{
     static double tFinal = 3600 * 24 * 365.0 * 1000;
     //Coordinates used for rendering output
     static double[] pos1,pos2;
+    static double r1,r2;
+    static final double speedscalar = 1;
     
     public static void main(String[] args) {
         //Initialize render output
@@ -26,15 +28,20 @@ public class Widget extends JPanel{
         Vector2D v,d;
         
         //Declare star 1
-        v = new Vector2D(0,29.78);
+        //v = new Vector2D(0,29.78);
+        //d = new Vector2D(214.93946938362,0);
+        //Star s1 = new Star(v,d,1/332946.0);
+        v = new Vector2D(0,200);
         d = new Vector2D(214.93946938362,0);
-        Star s1 = new Star(v,d,1/332946.0);
+        Star s1 = new Star(v,d,1);
         
         //Declare star 2        
+        //v = new Vector2D(0,0);
+        //d = new Vector2D(0,0);
+        //BlackHole s2 = new BlackHole(v,d,1);
         v = new Vector2D(0,0);
         d = new Vector2D(0,0);
-        BlackHole s2 = new BlackHole(v,d,1);
-        
+        BlackHole s2 = new BlackHole(v,d,50);
         //Orbit/Accuracy counting trackers
         double tmp = 0;
         boolean off = true;
@@ -46,7 +53,7 @@ public class Widget extends JPanel{
             //Saves the distance in the x direction and y direction for later, and computes the hypotenuse (total distance)
             double distSq = s2.getDis().distanceSq(s1.getDis());
             //Defines the timestep, based on the star's distance^2
-            tStep = distSq * 0.0000000001;
+            tStep = distSq * 0.00000000001 * speedscalar;
             //Find the force of gravity on the star
             double GForce = calcGForce(s1, s2, distSq);
             //Determine the coordinate component forces for each star (newton's third law, saves cpu cycles so not computing twice)
@@ -64,6 +71,8 @@ public class Widget extends JPanel{
             //Define rendered coordinates
             pos1 = new double[] {s1.getDis().getX(),s1.getDis().getY()};
             pos2 = new double[] {s2.getDis().getX(),s2.getDis().getY()};
+            r1 = s1.getRadius();
+            r2 = s2.getRadius();
             //Accuracy tracking
             double x1a = s1.getDis().getX();
             if (x1a > tmp) {
@@ -100,11 +109,11 @@ public class Widget extends JPanel{
     //Graphics
     @Override
     public void paint(Graphics g) {
-        g.clearRect(0, 0, 1700, 1000);
-        int height = 50;
-        int width = 50;
-        g.fillArc((int)pos1[0] - (width / 2) + 500, (int)pos1[1] - (height / 2) + 500, width, height, 0, 360);
-        g.fillArc((int)pos2[0] - (width / 20) + 500, (int)pos2[1] - (height / 20) + 500, width / 10, height / 10, 0, 360);
+        g.clearRect(0, 0, 1000, 1000);
+        g.setColor(Color.ORANGE);
+        g.fillArc((int)pos1[0] - (int)(r1 * 10.0) + 500, (int)pos1[1] - (int)(r1 * 10.0) + 500, (int)(r1 * 20), (int)(r1 * 20), 0, 360);
+        g.setColor(Color.black);
+        g.fillArc((int)pos2[0] - (int)(r2 * 10.0) + 500, (int)pos2[1] - (int)(r2 * 10.0) + 500, (int)(r2 * 20), (int)(r2 * 20), 0, 360);
         repaint();
     } 
     

@@ -6,7 +6,8 @@ public class Star {
     //Acceleration, velocity, and displacement values in ordered pairs (x,y)
     private Vector2D a,v,d;    
     //Mass in solar masses
-    private double mass, radius;
+    private double mass;
+    protected double radius;
     
     //Constructor
     public Star(Vector2D velocity, Vector2D displacement, double mass) {
@@ -14,7 +15,7 @@ public class Star {
         v = velocity;
         d = displacement;
         this.mass = mass;
-        this.radius = getRadius();
+        this.radius = computeRadius();
     }
     
     //Main timestepping methods
@@ -40,10 +41,13 @@ public class Star {
     public void setMass(double mass) {
         this.mass = mass;
     }
-    public double getRadius() {
+    public double computeRadius() {
         if (this.mass > 1) {
             return Math.pow(this.mass, 0.57);
         }
         return Math.pow(this.mass, 0.88);
+    }
+    public double getRadius() {
+        return this.radius;
     }
 }
