@@ -39,13 +39,13 @@ public class Widget extends JPanel{
         //v = new Vector2D(0,0);
         //d = new Vector2D(0,0);
         //BlackHole s2 = new BlackHole(v,d,1);
-        v = new Vector2D(0,0);
+        v = new Vector2D(0,-4);
         d = new Vector2D(0,0);
         BlackHole s2 = new BlackHole(v,d,50);
         //Orbit/Accuracy counting trackers
-        double tmp = 0;
-        boolean off = true;
-        int count = 0;
+        //double tmp = 0;
+        //boolean off = true;
+        //int count = 0;
         
         //Main update loop
         while (time <= tFinal) {
@@ -74,7 +74,7 @@ public class Widget extends JPanel{
             r1 = s1.getRadius();
             r2 = s2.getRadius();
             //Accuracy tracking
-            double x1a = s1.getDis().getX();
+            /*double x1a = s1.getDis().getX();
             if (x1a > tmp) {
                 off = true;
             }
@@ -84,7 +84,7 @@ public class Widget extends JPanel{
                 off = false;
                 count++;
             }
-            tmp = x1a;
+            tmp = x1a;*/
         }
     }
     
@@ -111,9 +111,9 @@ public class Widget extends JPanel{
     public void paint(Graphics g) {
         g.clearRect(0, 0, 1000, 1000);
         g.setColor(Color.ORANGE);
-        g.fillArc((int)pos1[0] - (int)(r1 * 10.0) + 500, (int)pos1[1] - (int)(r1 * 10.0) + 500, (int)(r1 * 20), (int)(r1 * 20), 0, 360);
+        g.fillArc((int)pos1[0] - (int)(r1 * 15.0) + 500, (int)pos1[1] - (int)(r1 * 15.0) + 500, (int)(r1 * 30), (int)(r1 * 30), 0, 360);
         g.setColor(Color.black);
-        g.fillArc((int)pos2[0] - (int)(r2 * 10.0) + 500, (int)pos2[1] - (int)(r2 * 10.0) + 500, (int)(r2 * 20), (int)(r2 * 20), 0, 360);
+        g.fillArc((int)pos2[0] - (int)(r2 * 15.0) + 500, (int)pos2[1] - (int)(r2 * 15.0) + 500, (int)(r2 * 30), (int)(r2 * 30), 0, 360);
         repaint();
     } 
     
