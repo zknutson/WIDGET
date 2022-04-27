@@ -18,6 +18,13 @@ public class Star {
         this.radius = computeRadius();
     }
     
+    public double computeRadius() {
+        if (this.mass > 1) {
+            return Math.pow(this.mass, 0.57);
+        }
+        return Math.pow(this.mass, 0.88);
+    }
+    
     //Main timestepping methods
     public void updateVelocity(Vector2D Fg, double tStep) {
         //Find the acceleration in each coordinate component direction, based on the gravitational force and the star's distance in each direction
@@ -33,21 +40,13 @@ public class Star {
     public Vector2D getDis() {
         return d;
     }
-
     public double getMass() {
         return mass;
     }
-
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-    public double computeRadius() {
-        if (this.mass > 1) {
-            return Math.pow(this.mass, 0.57);
-        }
-        return Math.pow(this.mass, 0.88);
-    }
     public double getRadius() {
         return this.radius;
+    }
+    public void setMass(double mass) {
+        this.mass = mass;
     }
 }
