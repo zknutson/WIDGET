@@ -8,7 +8,7 @@ public class Widget extends JPanel{
     //Gravity constant in Solar-Radii, Solar Masses, and Kilometers/second
     static final double G = 1.90809 * 100000;
     //Speedscalar controls the overall "fedelity" of the simulation Default: 1
-    static final double SPEEDSCALAR = 0.1;
+    static final double SPEEDSCALAR = 1;
     //Length of the simulation in seconds * 3600 hrs * 24 days * 365 years;
     static final double TFINAL = 3600 * 24 * 365.0 * 1000;
     //Time in seconds
@@ -31,8 +31,8 @@ public class Widget extends JPanel{
         InitRenderOutput(frame);     
         
         a = 300;
-        m1 = 5;
-        m2 = 50;
+        m1 = 0.1;
+        m2 = 5;
         e = 0;
         d1 = calcDisplacementFromBarycenter(a,m1,m2);
         d2 = a - d1;
@@ -57,7 +57,7 @@ public class Widget extends JPanel{
             Vector2D dis2 = s2.getDis();
             double distSq = dis2.distanceSq(dis1);
             //Defines the timestep, based on the star's distance^2
-            tStep = distSq * 0.00000000001 * SPEEDSCALAR;
+            tStep =  distSq * 0.00000000001 * SPEEDSCALAR;
             //Find the force of gravity on the star
             double GForce = calcGForce(s1, s2, distSq);
             //Determine the coordinate component forces for each star (newton's third law, saves cpu cycles so not computing twice)
@@ -144,7 +144,7 @@ public class Widget extends JPanel{
         else if (m1 > 0.5) {
             g.setColor(Color.ORANGE);
         }
-        else if (m1 > 0.1) {
+        else {
             g.setColor(Color.RED);
         }
         g.fillArc((int)pos1[0] - (int)(r1) + 500, (int)pos1[1] - (int)(r1) + 500, (int)(r1 * 2), (int)(r1 * 2), 0, 360);
