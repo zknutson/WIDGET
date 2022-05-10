@@ -6,7 +6,7 @@ public class Star {
     //Acceleration, velocity, and displacement values in ordered pairs (x,y)
     private Vector2D a,v,d;    
     //Mass in solar masses
-    private double mass;
+    protected double mass;
     protected double radius;
     
     //Constructor
@@ -40,6 +40,9 @@ public class Star {
     public Vector2D getDis() {
         return d;
     }
+    public Vector2D getVel() {
+        return v;
+    }
     public double getMass() {
         return mass;
     }
@@ -48,5 +51,6 @@ public class Star {
     }
     public void setMass(double mass) {
         this.mass = mass;
+        this.radius = computeRadius();
     }
 }

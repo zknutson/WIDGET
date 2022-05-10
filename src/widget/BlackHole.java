@@ -7,4 +7,8 @@ public class BlackHole extends Star {
         super(velocity,displacement,mass);
         this.radius = 0.25;
     }
+    @Override
+    public void setMass(double mass) {
+        this.mass = mass;
+    }
 }
