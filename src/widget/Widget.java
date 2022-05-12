@@ -11,16 +11,17 @@ public class Widget extends JPanel{
 //Gravity constant in Solar-Radii, Solar Masses, and Kilometers/second
     static final double G = 1.90809 * 100000;
     //Speedscalar controls the overall "fedelity" of the simulation Default: 1
-    static final double SPEEDSCALAR = 1;
+    static final double SPEEDSCALAR = 10;
     //Length of the simulation in seconds * 3600 hrs * 24 days * 365 years;
     static final double TFINAL = 3600 * 24 * 365.0 * 1000;
     //Time in seconds
     static double time = 0;
     static double tStep = 1;
     //Coordinates used for rendering output
-    static double[] pos1,pos2;
+    static double[] pos1 = {0,0} ,pos2 = {0,0};
     static double r1,r2;
     static double rlobe;
+    static final double ZOOM = 20;
     //ORBIT CHARACTERISTICS
     static double a,m1,m2,e,d1,d2;
     // a = Start distance between the two objects (perihelion) in solar radii
@@ -35,10 +36,10 @@ public class Widget extends JPanel{
         JFrame frame = new JFrame();
         InitRenderOutput(frame);     
         
-        a = 50;
-        m1 = 5;
-        m2 = 5;
-        e = 0;
+        a = 1/0.2054 ;
+        m1 = 1;
+        m2 = 10;
+        e = 0.6;
         d1 = calcDisplacementFromBarycenter(a,m1,m2);
         d2 = a - d1;
         
@@ -48,22 +49,21 @@ public class Widget extends JPanel{
         
         run(s1,s2);
     }
-    
     //Completes one full simulation scenario
     public static void run(Star s1 , Star s2) {
         //Orbit/Accuracy counting trackers
         //double tmp = 0;
         //boolean off = true;
-        //int count = 0;
-        double count = 0;
-        double mass = 0;
+        int count = 0;
+        double last = 0;
+        Vector2D periastronpos;
         while (time <= TFINAL) {
             //Saves the distance in the x direction and y direction for later, and computes the norm
             Vector2D dis1 = s1.getDis();
             Vector2D dis2 = s2.getDis();
             double distSq = dis2.distanceSq(dis1);
             //Defines the timestep, based on the star's distance^2
-            tStep =  distSq * 0.00000000001 * SPEEDSCALAR;
+            tStep =  distSq * 0.0000000001 * SPEEDSCALAR;
             //Find the force of gravity on the star
             double GForce = calcGForce(s1, s2, distSq);
             //Determine the coordinate component forces for each star (newton's third law, saves cpu cycles so not computing twice)
@@ -75,14 +75,27 @@ public class Widget extends JPanel{
             //Update the position of each star based off the velocity previously calculated
             s1.updatePosition(tStep);
             s2.updatePosition(tStep);
-            rlobe = eggletonVolumeEquivelantRocheLobe(Math.sqrt(distSq),m1/m2);
+            rlobe = eggletonVolumeEquivelantRocheLobe(Math.sqrt(distSq),m1/m2) * sepinskyCorrectionFunction(alphaFunction(getEccentricityVector(s1,s2).getNorm(),getCosTrueAnomaly(s1,s2)),m1/m2);
+            Vector2D offset = findBarycenter(s1,s2);
+            //double curr = apoPeriastronChecker(s1,s2);
+            //if (curr >= 0 && last <= 0) {
+            //    periastronpos = offset.subtract(s1.getDis());
+            //    System.out.println("Periastron vector from Barycenter: " + periastronpos);
+            //}
+            //last = curr;
+            //if(count % 100000 == 0) {
+            //System.out.println("Correction FUnction: " + sepinskyCorrectionFunction(alphaFunction(getEccentricityVector(s1,s2).getNorm(),getCosTrueAnomaly(s1,s2)),m1/m2));
+            //System.out.println("Eccentricity Vector: " + getEccentricityVector(s1,s2));
+            //System.out.println("True Anomaly: " + getCosTrueAnomaly(s1,s2));
+            //System.out.println("A: " + alphaFunction(getEccentricityVector(s1,s2).getNorm(),getCosTrueAnomaly(s1,s2)));
+            //}
+            //count++;
             //Iterate timestep
             time += tStep;
             //Define rendered coordinates
-            Vector2D offset = findBarycenter(s1,s2);
-            pos1 = new double[] {dis1.getX() - offset.getX() ,dis1.getY() - offset.getY()};
+            pos1 = new double[] {dis1.getX() - offset.getX(),dis1.getY() - offset.getY()};
             pos2 = new double[] {dis2.getX() - offset.getX(),dis2.getY() - offset.getY()};
-            r1 = s1.getRadius() * 2 + 5;
+            r1 = s1.getRadius() * 1;
             r2 = s2.getRadius() * 10;
             //Accuracy tracking
             /*double x1a = s1.getDis().getX();
@@ -102,9 +115,9 @@ public class Widget extends JPanel{
     //Initializes a star with given starting conditions
     private static Star InitStar(double a, double m1, double m2, double e, double displacement, boolean b) {
         if (b) {
-            return new BlackHole(new Vector2D(0,calcStartVelocity(a,displacement,m2,e)),new Vector2D(displacement,0),m1);
+            return new BlackHole(new Vector2D(0, 0 * calcStartVelocity(a,m1,m2,e)),new Vector2D(displacement,0),m1);
         }
-        return new Star(new Vector2D(0,-1 * calcStartVelocity(a,displacement,m2,e)),new Vector2D(-1 * displacement,0),m1);
+        return new Star(new Vector2D(0,-1 * calcStartVelocity(a,m1,m2,e)),new Vector2D(-1 * displacement,0),m1);
     }
     
     //Universal gravitational equation based on G, masses, and distance squared found earlier
@@ -120,8 +133,8 @@ public class Widget extends JPanel{
         return (a) / (1 + (m1/m2));
     }
     //Given relevant perameters, calculate the required velocity at perihelion to establish the desired starting orbit
-    public static double calcStartVelocity(double a, double radiusFromBarycenter, double mOther, double eccentricity) {
-        return 1.2 * Math.sqrt((G * mOther * radiusFromBarycenter) / (a * a));
+    public static double calcStartVelocity(double a, double m, double mOther, double eccentricity) {
+        return  Math.sqrt(((eccentricity + 1) * (G * (m + mOther))) / a); // * Math.sqrt((G * mOther * radiusFromBarycenter) / (a * a)); 
     }
     
     //Graphics
@@ -154,14 +167,17 @@ public class Widget extends JPanel{
         else {
             g.setColor(Color.RED);
         }
-        g.fillArc((int)pos1[0] - (int)(r1) + 500, (int)pos1[1] - (int)(r1) + 500, (int)(r1 * 2), (int)(r1 * 2), 0, 360);
+        g.fillArc((int)(pos1[0] * ZOOM) - (int)(r1 * ZOOM) + 500, (int)(pos1[1] * ZOOM) - (int)(r1 * ZOOM) + 500, (int)(r1 * ZOOM) * 2, (int)(r1 * ZOOM) * 2, 0, 360);
         g.setColor(Color.pink);
-        g.drawArc((int)pos1[0] - (int)(rlobe) + 500, (int)pos1[1] - (int)(rlobe) + 500,(int)rlobe * 2,(int)rlobe * 2,0,360);
+        g.drawArc((int)(pos1[0] * ZOOM) - (int)(rlobe * ZOOM) + 500, (int)(pos1[1] * ZOOM) - (int)(rlobe * ZOOM) + 500,(int)(rlobe * ZOOM) * 2,(int)(rlobe * ZOOM) * 2,0,360);
         g.setColor(Color.black);
-        g.fillArc((int)pos2[0] - (int)(r2) + 500, (int)pos2[1] - (int)(r2) + 500, (int)(r2 * 2), (int)(r2 * 2), 0, 360);
+        g.fillArc((int)(pos2[0] * ZOOM) - (int)(r2) + 500, (int)(pos2[1] * ZOOM) - (int)(r2) + 500, (int)(r2) * 2, (int)(r2) * 2, 0, 360);
+        //System.out.println(rlobe);
+        //System.out.println(pos1[0] + " " + pos1[1]);
+        //System.out.println(pos2[0] + " " + pos2[1]);
         repaint();
     }
-    //VALIDATED
+    /*//VALIDATED
     public static double sepinskyCorrectionFunction(double A, double q) {
         double in = Math.log10(A);
         return j0(in) + (j1(in) * Math.exp(-j2(in) * Math.pow(Math.log10(q),j3(in))));
@@ -181,11 +197,45 @@ public class Widget extends JPanel{
     //VALIDATED
     public static double j3(double A) {
         return 0.256 * Math.exp(-1.33 * Math.pow(A, 2.9)) * (5.5 * Math.exp(1.33 * Math.pow(A,2.9)) + 1);
+    }*/
+    //VALIDATED
+    public static double sepinskyCorrectionFunction(double A, double q) {
+        double in = Math.log10(A);
+        if (in >= 0.2) {
+        return i0(in) + i1(in) * Math.exp(-i2(in) * Math.pow(Math.log10(q) + i3(in),2));
+        }
+        return g0(in) + g1(in) * Math.log10(q) + g2(in) * Math.pow(Math.log10(q), 2);
+    }
+    //VALIDATED
+    public static double i0(double A) {
+        return (6.3014 * Math.pow(A, 1.3643))/(Math.exp(2.3644 * Math.pow(A,0.70748)) - (1.4413 * Math.exp(-0.0000184 * Math.pow(A, -4.5693))));
+    }
+    //VALIDATED
+    public static double i1(double A) {
+        return A / (0.0015 * Math.exp(8.84 * Math.pow(A,0.282)) + 15.78);
+    }
+    //VALIDATED
+    public static double i2(double A) {
+        return (1 + 0.036 * Math.exp(8.01 * Math.pow(A, 0.879))) / (0.105 * Math.exp(7.91 * Math.pow(A, 0.879)));
+    }
+    //VALIDATED
+    public static double i3(double A) {
+        return 0.991 / (1.38 * Math.exp(-0.035 * Math.pow(A, 0.76)) + 23.0 * Math.exp(-2.89 * Math.pow(A,0.76)));
+    }
+    public static double g0(double A) {
+        return 0.9978 - 0.1229 * A - 0.1273 * A * A;
+    }
+    public static double g1(double A) {
+        return 0.001 + 0.02556 * A;
+    }
+    public static double g2(double A) {
+        return 0.0004 + 0.0021 * A;
     }
     //VALIDATED
     public static double eggletonVolumeEquivelantRocheLobe(double seperation, double q) {
         return (seperation * 0.49 * Math.pow(q,2.0/3.0))/(0.6 * Math.pow(q,2.0/3.0) + Math.log(1 + Math.pow(q, 1.0/3.0)));
     }
+    //VALIDATED
     public static double alphaFunction (double eccentricity, double cosV) {
         return Math.pow(1 + eccentricity, 4) / Math.pow(1 + eccentricity * cosV, 3);
     }
@@ -199,5 +249,18 @@ public class Widget extends JPanel{
         //System.out.println("POSITION: " + s1.getDis());
         //System.out.println("BARYCENTER POS: " + findBarycenter(s1,s2));
         return s1.getDis().subtract(findBarycenter(s1,s2)).dotProduct(s1.getVel());
+    }
+    //VALIDATED
+    public static Vector2D getEccentricityVector(Star s1, Star s2) {
+        Vector2D v = s1.getVel().subtract(s2.getVel());
+        Vector2D r = s1.getDis().subtract(s2.getDis());
+        double meu = G * (s1.getMass() + s2.getMass());
+        return r.scalarMultiply((v.dotProduct(v)/meu) - (1/r.getNorm())).subtract(v.scalarMultiply(r.dotProduct(v) / meu));
+    }
+    //VALIDATED
+    public static double getCosTrueAnomaly(Star s1, Star s2) {
+        Vector2D r = s1.getDis().subtract(s2.getDis());
+        Vector2D e = getEccentricityVector(s1,s2);
+        return e.dotProduct(r) / (e.getNorm() * r.getNorm());
     }
 }
