@@ -27,13 +27,12 @@ public class Star {
     
     //Main timestepping methods
     public void updateVelocity(Vector2D Fg, double tStep) {
-        //Find the acceleration in each coordinate component direction, based on the gravitational force and the star's distance in each direction
         this.a = Fg.scalarMultiply(1/mass);
         this.v = v.add(tStep,a);
     }
     public void updatePosition(double tStep) {
-        d = d.add(tStep,v);
-        d = d.subtract(0.5 * tStep * tStep,a);
+        d = d.add(tStep,v.scalarMultiply(1/696000.0));
+        d = d.subtract(0.5 * tStep * tStep,a.scalarMultiply(1/696000.0));
     }
 
     //Getters and Setters
