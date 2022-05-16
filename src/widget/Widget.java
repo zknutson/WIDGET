@@ -33,11 +33,10 @@ public class Widget extends JPanel {
 
     public static void main(String[] args) {
         //Initialize render output
-        //JFrame frame = new JFrame();
-        //InitRenderOutput(frame);
-        
+        JFrame frame = new JFrame();
+        InitRenderOutput(frame);
+        Output out = new Output("control" + ".csv");
         for (double a = 10; a >= 0.1; a -= 0.1) {
-            Output out = new Output("control" + ".csv");
             out.writeTitle(new String[]{"dist", "aFinal", "timeTaken", "q", "e", "mFinal"});
             Star s1 = InitStar(a, 1.0, 5.0, 0.0, calcDisplacementFromBarycenter(a, 1.0, 5.0), false);
             Star s2 = InitStar(a, 5.0, 1.0, 0.0, a - calcDisplacementFromBarycenter(a, 1.0, 5.0), true);
@@ -45,8 +44,9 @@ public class Widget extends JPanel {
             System.arraycopy(new double[]{a}, 0, result, 0, 1);
             out.writeEntry(result);
         }
+        out.close();
         System.out.println("Control Complete");
-        for (double mStar = 0.2; mStar <= 5; mStar += 0.2) {
+        for (double mStar = 0.2; mStar <= 5.1; mStar += 0.2) {
             findClosestSeparation(mStar, 5, 0.0, "mStar" + Math.round(mStar * 10) / 10.0);
             System.out.println("mStar " + mStar + " complete");
         }
@@ -134,7 +134,7 @@ public class Widget extends JPanel {
                 tOut = 4 * pOrbit;
             }
             //Define rendered coordinates / perameters
-            /*
+            ///*
             Vector2D offset = findBarycenter(s1, s2);
             renderedPositionStar1 = new double[]{dis1.getX() - offset.getX(), dis1.getY() - offset.getY()};
             renderedPositionStar2 = new double[]{dis2.getX() - offset.getX(), dis2.getY() - offset.getY()};
