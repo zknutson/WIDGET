@@ -11,11 +11,11 @@ public class Widget extends JPanel {
 //Gravity constant in Solar-Radii, Solar Masses, and Kilometers/second ^ 2
 
     static final double G = 1.90809 * 100000;
-    //Speedscalar controls the overall "fedelity" of the simulation Default: 1
+    //Speed-scalar controls the overall "fidelity" of the simulation Default: 1
     static final double SPEEDSCALAR = 10;
     //Length of the simulation in seconds * 3600 s/hr * 24 hr/day * 365 days/year;
     static final double TFINAL = 3600 * 24 * 365 * 10;
-    //Coordinates/ perameters used for rendering output
+    //Coordinates/ parameters used for rendering output
     static final double ZOOM = 40;
     static double tStep;
     static double[] renderedPositionStar1, renderedPositionStar2;
@@ -97,7 +97,7 @@ public class Widget extends JPanel {
             Vector2D dis2 = s2.getDis();
             double distSq = dis2.distanceSq(dis1);
 
-            //Defines the timestep, based on the star's distance^2
+            //Defines the time-step, based on the star's distance^2
             tStep = distSq * 0.0001 * SPEEDSCALAR;
 
             //Find the force of gravity on the star
@@ -115,7 +115,7 @@ public class Widget extends JPanel {
             s1.updatePosition(tStep);
             s2.updatePosition(tStep);
 
-            //Determines the size of the roche lobe based off of orbital perameters
+            //Determines the size of the roche lobe based off of orbital parameters
             double q = s1.getMass() / s2.getMass();
             double e = getEccentricityVector(s1, s2).getNorm();
             double cosV = getCosTrueAnomaly(s1, s2);
@@ -123,7 +123,7 @@ public class Widget extends JPanel {
             double rlobe = eggletonVolumeEquivelantRocheLobe(Math.sqrt(distSq), q) * sepinskyCorrectionFunction(A, q);
 
             double before = s1.getMass();
-            //Handles the mass transfer process using a buffer to collect gas that is not coelecced to a significant degree to count towards the point mass of the black hole
+            //Handles the mass transfer process using a buffer to collect gas that is not coalesced to a significant degree to count towards the point mass of the black hole
             massBuffer = massTransferIntoBlackhole(s2, massBuffer, tStep);
             //Handles the parasitic mass loss from the star due to overfilling roche lobe
             massBuffer = massTransferFromStarToBuffer(s1, rlobe, massBuffer);
@@ -131,7 +131,7 @@ public class Widget extends JPanel {
                 pOrbit = getOrbitalPeriod(s1, s2);
                 tOut = 4 * pOrbit;
             }
-            //Define rendered coordinates / perameters
+            //Define rendered coordinates / parameters
             ///*
             Vector2D offset = findBarycenter(s1, s2);
             renderedPositionStar1 = new double[]{dis1.getX() - offset.getX(), dis1.getY() - offset.getY()};
@@ -162,7 +162,7 @@ public class Widget extends JPanel {
             }
         }
         //data[0] reserved for the separation distance
-        //Semimajoraxis at the end of the simulaiton        
+        //Semimajoraxis at the end of the simulation
         data[1] = getSemiMajorAxis(s1, s2);
         //Time the simulation took
         data[2] = time;
@@ -198,7 +198,7 @@ public class Widget extends JPanel {
         return (a) / (1 + (m1 / m2));
     }
 
-    //Given relevant perameters, calculate the required velocity at perihelion to establish the desired starting orbit
+    //Given relevant parameters, calculate the required velocity at perihelion to establish the desired starting orbit
     public static double calcStartVelocity(double a, double m, double mOther, double eccentricity) {
         return Math.sqrt(((eccentricity + 1) * (G * (m + mOther))) / a); // * Math.sqrt((G * mOther * radiusFromBarycenter) / (a * a)); 
     }
@@ -236,8 +236,8 @@ public class Widget extends JPanel {
         return new Vector2D(xBar, yBar);
     }
 
-    public static double eggletonVolumeEquivelantRocheLobe(double seperation, double q) {
-        return (seperation * 0.49 * Math.pow(q, 2.0 / 3.0)) / (0.6 * Math.pow(q, 2.0 / 3.0) + Math.log(1 + Math.pow(q, 1.0 / 3.0)));
+    public static double eggletonVolumeEquivelantRocheLobe(double separation, double q) {
+        return (separation * 0.49 * Math.pow(q, 2.0 / 3.0)) / (0.6 * Math.pow(q, 2.0 / 3.0) + Math.log(1 + Math.pow(q, 1.0 / 3.0)));
     }
 
     public static Vector2D getEccentricityVector(Star s1, Star s2) {
@@ -326,11 +326,9 @@ public class Widget extends JPanel {
             g.setColor(Color.RED);
         }
         g.fillArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedRadiusStar1 * ZOOM) * 2, (int) (renderedRadiusStar1 * ZOOM) * 2, 0, 360);
-        g.setColor(Color.pink);
-        g.drawArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedRocheLobe * ZOOM) * 2, (int) (renderedRocheLobe * ZOOM) * 2, 0, 360);
-        g.setColor(Color.black);
         g.fillArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedRadiusStar2) * 2, (int) (renderedRadiusStar2) * 2, 0, 360);
         g.setColor(Color.pink);
+        g.drawArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedRocheLobe * ZOOM) * 2, (int) (renderedRocheLobe * ZOOM) * 2, 0, 360);
         g.drawArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedMassBuffer * ZOOM) * 2, (int) (renderedMassBuffer * ZOOM) * 2, 0, 360);
         repaint();
     }
