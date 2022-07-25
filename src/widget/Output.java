@@ -22,7 +22,7 @@ public class Output {
             o.write(str[str.length - 1]);
             o.newLine();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Problem writing to file");
             e.getStackTrace();
         }
     }
@@ -35,7 +35,7 @@ public class Output {
             o.write(String.valueOf(d[d.length - 1]));
             o.newLine();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Problem writing to file");
             e.getStackTrace();
         }
     }

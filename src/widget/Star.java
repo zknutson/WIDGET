@@ -25,7 +25,7 @@ public class Star {
         return Math.pow(this.mass, 0.88);
     }
 
-    //Main timestepping methods
+    //Main time-step methods
     public void updateVelocity(Vector2D Fg, double tStep) {
         this.a = Fg.scalarMultiply(1 / mass);
         this.v = v.add(tStep, a);
