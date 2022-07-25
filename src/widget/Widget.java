@@ -2,10 +2,10 @@
 //Figure out max accretion rate then apply buffer
 package widget;
 
-import java.awt.*;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Widget extends JPanel {
 //Gravity constant in Solar-Radii, Solar Masses, and Kilometers/second ^ 2
@@ -15,8 +15,6 @@ public class Widget extends JPanel {
     static final double SPEEDSCALAR = 10;
     //Length of the simulation in seconds * 3600 s/hr * 24 hr/day * 365 days/year;
     static final double TFINAL = 3600 * 24 * 365 * 10;
-    //Time in seconds
-    static final double INITIALTOUT = 3600 * 24 * 30;
     static double tStep;
     //Coordinates/ perameters used for rendering output
     static final double ZOOM = 40;
