@@ -15,9 +15,9 @@ public class Widget extends JPanel {
     static final double SPEEDSCALAR = 10;
     //Length of the simulation in seconds * 3600 s/hr * 24 hr/day * 365 days/year;
     static final double TFINAL = 3600 * 24 * 365 * 10;
-    static double tStep;
     //Coordinates/ perameters used for rendering output
     static final double ZOOM = 40;
+    static double tStep;
     static double[] renderedPositionStar1, renderedPositionStar2;
     static double renderedRadiusStar1, renderedRadiusStar2;
     static double renderedRocheLobe;
@@ -86,7 +86,7 @@ public class Widget extends JPanel {
     public static double[] run(Star s1, Star s2) {
         double pOrbit = getOrbitalPeriod(s1, s2);
         double tOut = pOrbit * 2;
-        
+
         double massBuffer = 0;
         double time = 0;
         double[] data = new double[6];
@@ -230,34 +230,6 @@ public class Widget extends JPanel {
         return massBufferSize;
     }
 
-    @Override
-    public void paint(Graphics g) {
-        g.clearRect(0, 0, 1000, 1000);
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, 1000, 1000);
-        if (renderedMassStar1 > 40) {
-            g.setColor(Color.BLUE);
-        } else if (renderedMassStar1 > 10) {
-            g.setColor(Color.CYAN);
-        } else if (renderedMassStar1 > 1.5) {
-            g.setColor(Color.WHITE);
-        } else if (renderedMassStar1 > 1) {
-            g.setColor(Color.YELLOW);
-        } else if (renderedMassStar1 > 0.5) {
-            g.setColor(Color.ORANGE);
-        } else {
-            g.setColor(Color.RED);
-        }
-        g.fillArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedRadiusStar1 * ZOOM) * 2, (int) (renderedRadiusStar1 * ZOOM) * 2, 0, 360);
-        g.setColor(Color.pink);
-        g.drawArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedRocheLobe * ZOOM) * 2, (int) (renderedRocheLobe * ZOOM) * 2, 0, 360);
-        g.setColor(Color.black);
-        g.fillArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedRadiusStar2) * 2, (int) (renderedRadiusStar2) * 2, 0, 360);
-        g.setColor(Color.pink);
-        g.drawArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedMassBuffer * ZOOM) * 2, (int) (renderedMassBuffer * ZOOM) * 2, 0, 360);
-        repaint();
-    }
-
     public static Vector2D findBarycenter(Star s1, Star s2) {
         double xBar = (s1.getMass() * s1.getDis().getX() + s2.getMass() * s2.getDis().getX()) / (s1.getMass() + s2.getMass());
         double yBar = (s1.getMass() * s1.getDis().getY() + s2.getMass() * s2.getDis().getY()) / (s1.getMass() + s2.getMass());
@@ -333,5 +305,33 @@ public class Widget extends JPanel {
 
     public static double g2(double A) {
         return 0.0004 + 0.0021 * A;
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        g.clearRect(0, 0, 1000, 1000);
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, 1000, 1000);
+        if (renderedMassStar1 > 40) {
+            g.setColor(Color.BLUE);
+        } else if (renderedMassStar1 > 10) {
+            g.setColor(Color.CYAN);
+        } else if (renderedMassStar1 > 1.5) {
+            g.setColor(Color.WHITE);
+        } else if (renderedMassStar1 > 1) {
+            g.setColor(Color.YELLOW);
+        } else if (renderedMassStar1 > 0.5) {
+            g.setColor(Color.ORANGE);
+        } else {
+            g.setColor(Color.RED);
+        }
+        g.fillArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRadiusStar1 * ZOOM) + 500, (int) (renderedRadiusStar1 * ZOOM) * 2, (int) (renderedRadiusStar1 * ZOOM) * 2, 0, 360);
+        g.setColor(Color.pink);
+        g.drawArc((int) (renderedPositionStar1[0] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedPositionStar1[1] * ZOOM) - (int) (renderedRocheLobe * ZOOM) + 500, (int) (renderedRocheLobe * ZOOM) * 2, (int) (renderedRocheLobe * ZOOM) * 2, 0, 360);
+        g.setColor(Color.black);
+        g.fillArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedRadiusStar2) + 500, (int) (renderedRadiusStar2) * 2, (int) (renderedRadiusStar2) * 2, 0, 360);
+        g.setColor(Color.pink);
+        g.drawArc((int) (renderedPositionStar2[0] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedPositionStar2[1] * ZOOM) - (int) (renderedMassBuffer * ZOOM) + 500, (int) (renderedMassBuffer * ZOOM) * 2, (int) (renderedMassBuffer * ZOOM) * 2, 0, 360);
+        repaint();
     }
 }
